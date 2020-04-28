@@ -163,8 +163,12 @@ function declareNamedTypes(ast: AST, options: Options, rootASTName: string, proc
 function generateType(ast: AST, options: Options): string {
   const type = generateRawType(ast, options)
 
-  if (options.strictIndexSignatures && ast.keyName === '[k: string]') {
-    return `${type} | undefined`
+  if (options.strictIndexSignatures) {
+    return `${type}`
+  }
+
+  if (ast.keyName === '[k: string]') {
+    return ''
   }
 
   return type
@@ -312,7 +316,7 @@ function generateInterface(ast: TInterface, options: Options): string {
           (hasComment(ast) && !ast.standaloneName ? generateComment(ast.comment) + '\n' : '') +
           escapeKeyName(keyName) +
           (isRequired ? '' : '?') +
-          ': ' +
+          `${keyName === '[k: string]' ? '' : ': '}` +
           (hasStandaloneName(ast) ? toSafeString(type) : type)
       )
       .join('\n') +
@@ -364,7 +368,7 @@ function escapeKeyName(keyName: string): string {
     return keyName
   }
   if (keyName === '[k: string]') {
-    return keyName
+    return ''
   }
   return JSON.stringify(keyName)
 }

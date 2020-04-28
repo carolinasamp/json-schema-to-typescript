@@ -147,8 +147,11 @@ function declareNamedTypes(ast, options, rootASTName, processed) {
 }
 function generateType(ast, options) {
     var type = generateRawType(ast, options);
-    if (options.strictIndexSignatures && ast.keyName === '[k: string]') {
-        return type + " | undefined";
+    if (options.strictIndexSignatures) {
+        return "" + type;
+    }
+    if (ast.keyName === '[k: string]') {
+        return '';
     }
     return type;
 }
@@ -278,7 +281,7 @@ function generateInterface(ast, options) {
             return (AST_1.hasComment(ast) && !ast.standaloneName ? generateComment(ast.comment) + '\n' : '') +
                 escapeKeyName(keyName) +
                 (isRequired ? '' : '?') +
-                ': ' +
+                ("" + (keyName === '[k: string]' ? '' : ': ')) +
                 (AST_1.hasStandaloneName(ast) ? utils_1.toSafeString(type) : type);
         })
             .join('\n') +
@@ -318,7 +321,7 @@ function escapeKeyName(keyName) {
         return keyName;
     }
     if (keyName === '[k: string]') {
-        return keyName;
+        return '';
     }
     return JSON.stringify(keyName);
 }
